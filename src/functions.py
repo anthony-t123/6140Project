@@ -50,30 +50,35 @@ def PCA(data: np.ndarray, eigen: bool = False) -> np.ndarray | tuple[np.ndarray,
 
 
 # A lot of cleaning up to do here, I'll get to it but for now just putting this here
-def tSNE(sample) -> np.ndarray:
+def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 50, use_momentum: bool = True, output: bool = True) -> np.ndarray:
     """
 
     Perform tSNE on a given dataset.
 
     Parameters
     --------
-    sample : ndarray
+    data : ndarray
         Input dataset
-
+    perplexity : float
+        Perplexity.
+    no_dims : float, optional
+        Number of dimensions to output. Default 2.
+    PCA_dims : float, optional
+        Number of dimensions to reduce to using PCA. Default 50.
+    use_momentum : bool, optional
+        Whether to use momentum in the gradient descent step. Default True.
+    output : bool, optional
+        Print the error and graph current projection every ten iterations of gradient descent. Default True.
     Returns
     --------
     Y : ndarray
         Output of tSNE.
     """
-    # Prep data
-    X = MinMaxScaler().fit_transform(sample)
-    N, F = X.shape
-    no_dims = 2
-    PCA_dims = 50
-    use_momentum = 1
-    perplexity = 30.0
+    # Center data
+    X = MinMaxScaler().fit_transform(data)
 
     # Run PCA
+    # TODO: test that this PCA is working, potentially just replace with call to above
     (n, d) = X.shape
     X = X - np.tile(np.mean(X, 0), (n, 1))
     (l, M) = np.linalg.eig(np.dot(X.T, X))
@@ -85,7 +90,7 @@ def tSNE(sample) -> np.ndarray:
 
     # Compute similarities p_ij for each row i:
     P = np.zeros((n, n))
-    for i in tqdm(range(n)):
+    for i in (tqdm(range(n)) if output else range(n)):
         beta = np.ones((n, 1))
         D_i = D[i, np.concatenate((np.r_[0:i], np.r_[i + 1:n]))]
         P_i = np.zeros((1, n))
@@ -100,6 +105,7 @@ def tSNE(sample) -> np.ndarray:
             P_i = np.exp(-D_i.copy() * beta[i])
             sumP = sum(P_i)
             H = np.log(sumP) + beta[i] * np.sum(D_i * P_i) / sumP
+            # TODO: P_i and H_diff vs Hdiff
             P_i = P_i / sumP
             H_diff = H - np.log(perplexity)
 
@@ -167,7 +173,7 @@ def tSNE(sample) -> np.ndarray:
         Y = Y - np.tile(np.mean(Y, 0), (n, 1))
 
         # print loss and scatterplot every ten iterations
-        if (iteration + 1) % 10 == 0:
+        if output and (iteration + 1) % 10 == 0:
             cost = np.sum(P * np.log(P / Q))
             print(f'Iteration {iteration + 1}: error is {cost}')
             plt.scatter(Y[:, 0], Y[:, 1])

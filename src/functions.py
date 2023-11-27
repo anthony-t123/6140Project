@@ -46,7 +46,7 @@ def PCA(data: np.ndarray, eigen: bool = False) -> np.ndarray | tuple[np.ndarray,
     # Transform dataset by taking the dot product with the eigen vectors
     transformed_dataset = data @ sorted_eigen_vectors
 
-    return transformed_dataset if not eigen else transformed_dataset, sorted_eigen_values, sorted_eigen_vectors
+    return transformed_dataset, sorted_eigen_values, sorted_eigen_vectors if eigen else transformed_dataset
 
 
 # A lot of cleaning up to do here, I'll get to it but for now just putting this here

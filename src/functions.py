@@ -213,7 +213,7 @@ def evaluate(data, labels, train_indices, test_indices, classifier) -> dict:
     finish = time()
 
     output = {'Train_Score': model.score(x_train, y_train),
-              'Test_Score': model.score(x_train, y_train),
+              'Test_Score': model.score(x_test, y_testgi),
               'Train_Time': finish-start,
               'Model_Size': getsizeof(model)}
 

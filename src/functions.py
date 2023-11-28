@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from tqdm.autonotebook import tqdm
+from time import time
+from sys import getsizeof
 
 
 def PCA(data: np.ndarray, eigen: bool = False):  # -> np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -46,7 +48,7 @@ def PCA(data: np.ndarray, eigen: bool = False):  # -> np.ndarray | tuple[np.ndar
     # Transform dataset by taking the dot product with the eigen vectors
     transformed_dataset = data @ sorted_eigen_vectors
 
-    return transformed_dataset, sorted_eigen_values, sorted_eigen_vectors if eigen else transformed_dataset
+    return (transformed_dataset, sorted_eigen_values, sorted_eigen_vectors) if eigen else transformed_dataset
 
 
 # A lot of cleaning up to do here, I'll get to it but for now just putting this here
@@ -186,7 +188,7 @@ def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 
     return Y
 
 
-def evaluate(data, labels, train_indices, test_indices, classifier, iterations: int = 10) -> float:
+def evaluate(data, labels, train_indices, test_indices, classifier) -> dict:
     """
     Evaluate a model on a given dataset.
 
@@ -200,9 +202,19 @@ def evaluate(data, labels, train_indices, test_indices, classifier, iterations: 
         Indices of testing samples.
     param classifier:
         Classifier object, should have fit, score, and predict_proba functions.
-    param iterations: float
-        Number of runs to average score over. Default 10.
-    return: Average score over iterations.
-    """
 
-    return None
+    return: Scoring metrics.
+    """
+    x_train, x_test = data[:, :train_indices], data[:, :test_indices]
+    y_train, y_test = labels[:, :train_indices], labels[:, :test_indices]
+
+    start = time()
+    model = classifier.fit(x_train, y_train)
+    finish = time()
+
+    output = {'Train_Score': model.score(x_train, y_train),
+              'Test_Score': model.score(x_train, y_train),
+              'Train_Time': finish-start,
+              'Model_Size': getsizeof(model)}
+
+    return output

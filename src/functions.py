@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 from tqdm.autonotebook import tqdm
 
 
-def PCA(data: np.ndarray, eigen: bool = False): #-> np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray]:
+def PCA(data: np.ndarray, eigen: bool = False):  # -> np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Perform PCA on given data.
 
@@ -50,7 +50,8 @@ def PCA(data: np.ndarray, eigen: bool = False): #-> np.ndarray | tuple[np.ndarra
 
 
 # A lot of cleaning up to do here, I'll get to it but for now just putting this here
-def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 50, use_momentum: bool = True, output: bool = True) -> np.ndarray:
+def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 50, use_momentum: bool = True,
+         output: bool = True) -> np.ndarray:
     """
 
     Perform tSNE on a given dataset.
@@ -183,3 +184,25 @@ def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 
         if iteration == 100:
             P = P / 4.
     return Y
+
+
+def evaluate(data, labels, train_indices, test_indices, classifier, iterations: int = 10) -> float:
+    """
+    Evaluate a model on a given dataset.
+
+    param data:
+        Original dataset.
+    param labels:
+        Data labels.
+    param train_indices:
+        Indices of training samples.
+    param test_indices:
+        Indices of testing samples.
+    param classifier:
+        Classifier object, should have fit, score, and predict_proba functions.
+    param iterations: float
+        Number of runs to average score over. Default 10.
+    return: Average score over iterations.
+    """
+
+    return None

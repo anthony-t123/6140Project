@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 from tqdm.autonotebook import tqdm
 
 
-def PCA(data: np.ndarray, eigen: bool = False) -> np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray]:
+def PCA(data: np.ndarray, eigen: bool = False): #-> np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Perform PCA on given data.
 

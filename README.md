@@ -6,10 +6,17 @@
 ## Baseline performance for non feature engineered
 
 ## Engineered features performance
-- length * width
+- area (length * width)
+- sqrt(length * width)
+- aspect ratio (length / width)
 - length<sup>2
 - width<sup>2
-- pedal and sepal
+- above for both petal and sepal
+- petal vs sepal area ratio
+- sepal/petal length ratio
+- sepal/petal width ratio
+- sepal-petal length difference
+- sepal-petal width difference
 
 ## Transforms performance
 - PCA

@@ -51,8 +51,40 @@ def PCA(data: np.ndarray, eigen: bool = False):  # -> np.ndarray | tuple[np.ndar
     return (transformed_dataset, sorted_eigen_values, sorted_eigen_vectors) if eigen else transformed_dataset
 
 
+def LDA(X: np.ndarray, y: np.ndarray, num_components: int = 2, eigen: bool = False) -> np.ndarray:
+    """
+
+    :param X : np.ndarray
+        Input dataset.
+    :param y : np.ndarray
+        Labels for input dataset.
+    :param num_components : int
+        Number of components to project onto, default 2.
+    :param eigen : bool
+        Default false, return the eigen vectors in tuple.
+    :return : np.ndarray
+        Transformed data, or tuple with eigen vectors.
+    """
+    height, width = X.shape
+    unique_classes = np.unique(y)
+    nclasses = len(unique_classes)
+
+    scatter_t = np.cov(X.T) * (height - 1)
+    scatter_w = 0
+    for i in range(nclasses):
+        class_items = np.flatnonzero(y == unique_classes[i])
+        scatter_w = scatter_w + np.cov(X[class_items].T) * (len(class_items) - 1)
+
+    scatter_b = scatter_t - scatter_w
+    _, eig_vectors = np.linalg.eigh(np.linalg.pinv(scatter_w).dot(scatter_b))
+
+    pc = X.dot(eig_vectors[:, ::-1][:, :num_components])
+
+    return (pc, eig_vectors) if eigen else pc
+
+
 # A lot of cleaning up to do here, I'll get to it but for now just putting this here
-def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 50, use_momentum: bool = True,
+def tSNE(data: np.ndarray, perplexity: float = 10, epsilon: float = 2, no_dims: int = 2, PCA_dims: int = 50, use_momentum: bool = True,
          output: bool = True) -> np.ndarray:
     """
 
@@ -63,7 +95,9 @@ def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 
     data : ndarray
         Input dataset
     perplexity : float
-        Perplexity.
+        Perplexity, default 10.
+    epsilon : float
+        Epsilon, default 2.
     no_dims : float, optional
         Number of dimensions to output. Default 2.
     PCA_dims : float, optional
@@ -143,7 +177,6 @@ def tSNE(data: np.ndarray, perplexity: float, no_dims: int = 2, PCA_dims: int = 
 
     # initialize tSNE
     max_iter = 400
-    epsilon = 500
     min_gain = .01
     Y = np.random.randn(n, no_dims)
     y_grads = np.zeros((n, no_dims))
@@ -214,7 +247,7 @@ def evaluate(data, labels, train_indices, test_indices, classifier) -> dict:
 
     output = {'Train_Score': model.score(x_train, y_train),
               'Test_Score': model.score(x_test, y_testgi),
-              'Train_Time': finish-start,
+              'Train_Time': finish - start,
               'Model_Size': getsizeof(model)}
 
     return output

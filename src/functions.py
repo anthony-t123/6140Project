@@ -238,8 +238,8 @@ def evaluate(data, labels, train_indices, test_indices, classifier) -> dict:
 
     return: Scoring metrics.
     """
-    x_train, x_test = data[:, :train_indices], data[:, :test_indices]
-    y_train, y_test = labels[:, :train_indices], labels[:, :test_indices]
+    x_train, x_test = data[train_indices], data[test_indices]
+    y_train, y_test = labels[train_indices], labels[test_indices]
 
     start = time()
     model = classifier.fit(x_train, y_train)
